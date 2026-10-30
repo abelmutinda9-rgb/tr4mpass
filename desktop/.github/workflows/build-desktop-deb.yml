@@ -1,0 +1,45 @@
+name: Build Ubuntu Desktop DEB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - desktop-shell
+    paths:
+      - "desktop/**"
+      - ".github/workflows/build-desktop-deb.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            dpkg-dev \
+            python3 \
+            python3-tk \
+            usbutils \
+            libimobiledevice-utils
+
+      - name: Validate Python application
+        run: python3 -m py_compile desktop/app.py
+
+      - name: Build Debian package
+        run: bash desktop/packaging/build-desktop-deb.sh
+
+      - name: Upload DEB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tr4mpass-desktop-deb
+          path: desktop/build/tr4mpass-desktop_0.1.0_all.deb
+          if-no-files-found: error
+          retention-days: 14
