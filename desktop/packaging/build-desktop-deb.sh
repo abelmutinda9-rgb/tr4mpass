@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -9,12 +8,13 @@ ARCH="all"
 OUT="$ROOT/build/tr4mpass-desktop_${VERSION}_${ARCH}.deb"
 
 rm -rf "$PKGROOT"
+
 mkdir -p "$PKGROOT/DEBIAN"
 mkdir -p "$PKGROOT/usr/share/tr4mpass-desktop"
 mkdir -p "$PKGROOT/usr/bin"
 mkdir -p "$PKGROOT/usr/share/applications"
 
-install -m 0644 "$ROOT/desktop/app.py" \
+install -m 0644 "$ROOT/app.py" \
   "$PKGROOT/usr/share/tr4mpass-desktop/app.py"
 
 cat > "$PKGROOT/DEBIAN/control" <<CONTROL
@@ -22,7 +22,7 @@ Package: tr4mpass-desktop
 Version: $VERSION
 Section: utils
 Priority: optional
-Architecture: all
+Architecture: $ARCH
 Maintainer: tr4mpass desktop contributors
 Depends: python3, python3-tk, usbutils, libimobiledevice-utils
 Description: Desktop USB device diagnostics interface
@@ -34,6 +34,7 @@ cat > "$PKGROOT/usr/bin/tr4mpass-desktop" <<'LAUNCHER'
 #!/bin/sh
 exec /usr/bin/python3 /usr/share/tr4mpass-desktop/app.py "$@"
 LAUNCHER
+
 chmod 0755 "$PKGROOT/usr/bin/tr4mpass-desktop"
 
 cat > "$PKGROOT/usr/share/applications/tr4mpass-desktop.desktop" <<'DESKTOP'
@@ -46,6 +47,7 @@ Terminal=false
 Type=Application
 Categories=Utility;System;
 DESKTOP
+
 chmod 0644 "$PKGROOT/usr/share/applications/tr4mpass-desktop.desktop"
 
 mkdir -p "$ROOT/build"
